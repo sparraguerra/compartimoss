@@ -2,8 +2,10 @@
 
 namespace AspNetCoreMvcClient.Data
 {
-    public class AuthenticationTicket : BaseEntity
-    { 
+    public class AuthenticationTicket
+    {
+        public Guid Id { get; set; }
+
         public string UserId { get; set; }
 
         public byte[] Value { get; set; }

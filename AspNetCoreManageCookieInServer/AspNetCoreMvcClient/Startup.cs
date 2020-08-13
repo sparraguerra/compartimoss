@@ -1,4 +1,5 @@
 using AspNetCoreMvcClient.Data;
+using AspNetCoreMvcClient.Infraestructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.IO;
+using System;
 
 namespace AspNetCoreMvcClient
 {
@@ -21,7 +22,10 @@ namespace AspNetCoreMvcClient
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
@@ -35,19 +39,25 @@ namespace AspNetCoreMvcClient
             services.AddDbContext<DataProtectionKeysContext>(options =>
                 options.UseSqlite(
                     Configuration.GetConnectionString("DataProtectionKeysConnection")));
-             
+
             services.AddDataProtection()
                 .PersistKeysToDbContext<DataProtectionKeysContext>()
                 .SetApplicationName("demo")
                 .UseCryptographicAlgorithms(encryptionSettings);
 
+            services.AddHttpContextAccessor();
 
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = "cookie";
                 options.DefaultChallengeScheme = "oidc";
             })
-            .AddCookie("cookie")
+            .AddCookie("cookie", options =>
+            {
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(2);
+                options.SlidingExpiration = true;
+                options.SessionStore = new TicketStore(services);
+            })
             .AddOpenIdConnect("oidc", options =>
             {
                 options.Authority = "https://localhost:5001";
@@ -60,15 +70,20 @@ namespace AspNetCoreMvcClient
 
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
+                options.Scope.Add("email");
                 options.Scope.Add("scope1");
                 options.Scope.Add("scope2");
                 options.GetClaimsFromUserInfoEndpoint = true;
                 options.SaveTokens = true;
-            });
+            }); 
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <summary>
+        /// Configure
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
