@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace IdentityServerHost.Quickstart.UI
 {
@@ -158,14 +159,9 @@ namespace IdentityServerHost.Quickstart.UI
             // build a model so the logout page knows what to display
             var vm = await BuildLogoutViewModelAsync(logoutId);
 
-            if (vm.ShowLogoutPrompt == false)
-            {
-                // if the request for logout was properly authenticated from IdentityServer, then
-                // we don't need to show the prompt and can just log the user out directly.
-                return await Logout(vm);
-            }
-
-            return View(vm);
+            // if the request for logout was properly authenticated from IdentityServer, then
+            // we don't need to show the prompt and can just log the user out directly.
+            return await Logout(vm);             
         }
 
         /// <summary>
@@ -178,13 +174,14 @@ namespace IdentityServerHost.Quickstart.UI
             // build a model so the logged out page knows what to display
             var vm = await BuildLoggedOutViewModelAsync(model.LogoutId);
 
-            if (User?.Identity.IsAuthenticated == true)
+            var user = HttpContext.User;
+            if (user?.Identity.IsAuthenticated == true)
             {
                 // delete local authentication cookie
-                await _signInManager.SignOutAsync();
+                await HttpContext.SignOutAsync();
 
                 // raise the logout event
-                await _events.RaiseAsync(new UserLogoutSuccessEvent(User.GetSubjectId(), User.GetDisplayName()));
+                await _events.RaiseAsync(new UserLogoutSuccessEvent(user.GetSubjectId(), user.GetDisplayName()));
             }
 
             // check if we need to trigger sign-out at an upstream identity provider
@@ -199,7 +196,11 @@ namespace IdentityServerHost.Quickstart.UI
                 return SignOut(new AuthenticationProperties { RedirectUri = url }, vm.ExternalAuthenticationScheme);
             }
 
-            return View("LoggedOut", vm);
+            if (string.IsNullOrWhiteSpace(vm.PostLogoutRedirectUri))
+            {
+                return Redirect(WebUtility.UrlDecode("https://localhost:44378/"));
+            }
+            return Redirect(vm.PostLogoutRedirectUri);
         }
 
         [HttpGet]

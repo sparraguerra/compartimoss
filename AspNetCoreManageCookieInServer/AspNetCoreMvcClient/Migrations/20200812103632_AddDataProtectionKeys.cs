@@ -15,11 +15,7 @@ namespace AspNetCoreMvcClient.Migrations
                     UserId = table.Column<string>(nullable: true),
                     Value = table.Column<byte[]>(nullable: true),
                     LastActivity = table.Column<DateTimeOffset>(nullable: true),
-                    Expires = table.Column<DateTimeOffset>(nullable: true),
-                    RemoteIpAddress = table.Column<string>(nullable: true),
-                    OperatingSystem = table.Column<string>(nullable: true),
-                    UserAgentFamily = table.Column<string>(nullable: true),
-                    UserAgentVersion = table.Column<string>(nullable: true)
+                    Expires = table.Column<DateTimeOffset>(nullable: true) 
                 },
                 constraints: table =>
                 {

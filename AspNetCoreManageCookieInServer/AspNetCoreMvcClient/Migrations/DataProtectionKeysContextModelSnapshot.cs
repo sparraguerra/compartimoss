@@ -26,19 +26,7 @@ namespace AspNetCoreMvcClient.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("LastActivity")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OperatingSystem")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RemoteIpAddress")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserAgentFamily")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserAgentVersion")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT"); 
 
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");

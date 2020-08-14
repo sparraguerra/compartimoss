@@ -1,13 +1,9 @@
 ﻿using AspNetCoreMvcClient.Data;
-using AspNetCoreMvcClient.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using AuthenticationTicket = Microsoft.AspNetCore.Authentication.AuthenticationTicket;
 
@@ -68,6 +64,11 @@ namespace AspNetCoreMvcClient.Infraestructure
             }
         }
 
+        /// <summary>
+        /// RetrieveAsync
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public async Task<AuthenticationTicket> RetrieveAsync(string key)
         {
             using var scope = services.BuildServiceProvider().CreateScope();
@@ -94,8 +95,7 @@ namespace AspNetCoreMvcClient.Infraestructure
         /// <returns></returns>
         public async Task<string> StoreAsync(AuthenticationTicket ticket)
         {
-            const string principalEmailType = "email";
-            const string userAgentHeader = "user-agent";
+            const string principalEmailType = "email"; 
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var userId = ticket.Principal.FindFirst(t => t.Type == principalEmailType)?.Value;
@@ -108,28 +108,7 @@ namespace AspNetCoreMvcClient.Infraestructure
                 Value = SerializeToBytes(ticket),
                 Expires = ticket.Properties.ExpiresUtc
             };
-
-            var httpContextAccessor = scope.ServiceProvider.GetService<IHttpContextAccessor>();
-            var httpContext = httpContextAccessor?.HttpContext;
-            if (httpContext != null)
-            {
-                var remoteIpAddress = httpContext.Request.GetClientIP();
-                if (remoteIpAddress != null)
-                {
-                    authenticationTicket.RemoteIpAddress = remoteIpAddress;
-                }
-
-                var userAgent = httpContext.Request.Headers?.FirstOrDefault(s => s.Key.ToLower() == userAgentHeader).Value;
-                if (!string.IsNullOrWhiteSpace(userAgent))
-                {
-                    var uaParser = UAParser.Parser.GetDefault();
-                    var clientInfo = uaParser.Parse(userAgent);
-                    authenticationTicket.OperatingSystem = clientInfo.OS.ToString();
-                    authenticationTicket.UserAgentFamily = clientInfo.UA.Family;
-                    authenticationTicket.UserAgentVersion = $"{clientInfo.UA.Major}.{clientInfo.UA.Minor}.{clientInfo.UA.Patch}";
-                }
-            }
-
+           
             context.AuthenticationTickets.Add(authenticationTicket);
             await context.SaveChangesAsync();
 
