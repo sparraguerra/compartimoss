@@ -42,38 +42,18 @@ namespace AspNetCoreMvcClient.Controllers
         }
 
         public async Task<IActionResult> SignOut()
-        {
-            if (User?.Identity.IsAuthenticated == true)
+        {  
+            await HttpContext.SignOutAsync("cookie");
+            var props = new AuthenticationProperties()
             {
-                var props = new AuthenticationProperties()
-                {
-                    RedirectUri = "/"
-                };
-                await HttpContext.SignOutAsync("cookie");
-                await HttpContext.SignOutAsync("oidc", props);
-            }
-
+                RedirectUri = "/"
+            };
+            await HttpContext.SignOutAsync("oidc", props);
             foreach (var cookieKey in HttpContext.Request.Cookies.Keys)
             {
                 HttpContext.Response.Cookies.Delete(cookieKey);
             }
-
-            string endSessionUrl = string.Empty;
-            var token = await httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-            using (var client = new HttpClient())
-            {
-                var disco = await client.GetDiscoveryDocumentAsync("https://localhost:5001");
-                if (disco.IsError)
-                {
-                    throw new InvalidOperationException(disco.Error);
-                }
-
-                var requestUrl = new RequestUrl(disco.EndSessionEndpoint);
-
-                endSessionUrl = requestUrl.CreateEndSessionUrl(token, WebUtility.UrlEncode("https://localhost:44378/")); 
-            }
-                
-            return new RedirectResult(endSessionUrl);
+            return RedirectToAction("Index", "Home"); 
         }
     }
 }

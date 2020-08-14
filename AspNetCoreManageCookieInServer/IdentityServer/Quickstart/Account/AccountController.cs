@@ -196,10 +196,6 @@ namespace IdentityServerHost.Quickstart.UI
                 return SignOut(new AuthenticationProperties { RedirectUri = url }, vm.ExternalAuthenticationScheme);
             }
 
-            if (string.IsNullOrWhiteSpace(vm.PostLogoutRedirectUri))
-            {
-                return Redirect(WebUtility.UrlDecode("https://localhost:44378/"));
-            }
             return Redirect(vm.PostLogoutRedirectUri);
         }
 
