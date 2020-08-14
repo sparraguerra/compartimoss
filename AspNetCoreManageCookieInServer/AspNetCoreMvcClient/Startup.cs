@@ -30,14 +30,6 @@ namespace AspNetCoreMvcClient
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews(options =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
-            });
-
             var encryptionSettings = new AuthenticatedEncryptorConfiguration()
             {
                 EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
@@ -83,7 +75,15 @@ namespace AspNetCoreMvcClient
                 options.Scope.Add("scope2");
                 options.GetClaimsFromUserInfoEndpoint = true;
                 options.SaveTokens = true;
-            }); 
+            });
+
+            services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
         }
 
         /// <summary>

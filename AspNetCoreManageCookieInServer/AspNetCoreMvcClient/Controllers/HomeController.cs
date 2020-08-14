@@ -1,14 +1,10 @@
 ﻿using AspNetCoreMvcClient.Models;
-using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Diagnostics;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace AspNetCoreMvcClient.Controllers
@@ -16,12 +12,10 @@ namespace AspNetCoreMvcClient.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> logger;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ILogger<HomeController> logger; 
 
-        public HomeController(IHttpContextAccessor httpContextAccessor, ILogger<HomeController> logger)
-        {
-            this.httpContextAccessor = httpContextAccessor;
+        public HomeController(ILogger<HomeController> logger)
+        { 
             this.logger = logger;
         }
 
