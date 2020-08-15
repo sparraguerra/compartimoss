@@ -29,24 +29,22 @@ namespace AspNetCoreMvcClient
         /// </summary>
         /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
-        {
+        {            
+            services.AddDbContext<DataProtectionKeysContext>(options =>
+                options.UseSqlite(
+                    Configuration.GetConnectionString("DataProtectionKeysConnection")));
+
             var encryptionSettings = new AuthenticatedEncryptorConfiguration()
             {
                 EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
                 ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
-            }; 
-
-            services.AddDbContext<DataProtectionKeysContext>(options =>
-                options.UseSqlite(
-                    Configuration.GetConnectionString("DataProtectionKeysConnection")));
+            };
 
             services.AddDataProtection()
                 .PersistKeysToDbContext<DataProtectionKeysContext>()
                 .SetApplicationName("demo")
                 .UseCryptographicAlgorithms(encryptionSettings);
-
-            services.AddHttpContextAccessor();
-
+            
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = "cookie";
