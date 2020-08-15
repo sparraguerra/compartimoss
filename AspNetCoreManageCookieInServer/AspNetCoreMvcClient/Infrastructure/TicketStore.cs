@@ -1,6 +1,7 @@
 ﻿using AspNetCoreMvcClient.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -15,11 +16,13 @@ namespace AspNetCoreMvcClient.Infraestructure
     public class TicketStore : ITicketStore
     {
         private readonly IServiceCollection services;
+        private readonly IDataProtector dataProtector;
 
-        public TicketStore(IServiceCollection services)
+        public TicketStore(IServiceCollection services, IDataProtectionProvider dataProtectionProvider)
         {
             this.services = services;
-        } 
+            this.dataProtector = dataProtectionProvider.CreateProtector(GetType().FullName);
+        }
 
         /// <summary>
         /// RemoveAsync
@@ -56,7 +59,7 @@ namespace AspNetCoreMvcClient.Infraestructure
                 var authenticationTicket = await context.AuthenticationTickets.FindAsync(id);
                 if (authenticationTicket != null)
                 {
-                    authenticationTicket.Value = SerializeToBytes(ticket);
+                    authenticationTicket.Value = dataProtector.Protect(SerializeToBytes(ticket));
                     authenticationTicket.LastActivity = DateTimeOffset.UtcNow;
                     authenticationTicket.Expires = ticket.Properties.ExpiresUtc;
                     await context.SaveChangesAsync();
@@ -81,9 +84,9 @@ namespace AspNetCoreMvcClient.Infraestructure
                     authenticationTicket.LastActivity = DateTimeOffset.UtcNow;
                     await context.SaveChangesAsync();
 
-                    return DeserializeFromBytes(authenticationTicket.Value);
+                    return DeserializeFromBytes(dataProtector.Unprotect(authenticationTicket.Value));
                 }
-            }             
+            }
 
             return null;
         }
@@ -95,7 +98,7 @@ namespace AspNetCoreMvcClient.Infraestructure
         /// <returns></returns>
         public async Task<string> StoreAsync(AuthenticationTicket ticket)
         {
-            const string principalEmailType = "email"; 
+            const string principalEmailType = "email";
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var userId = ticket.Principal.FindFirst(t => t.Type == principalEmailType)?.Value;
@@ -105,10 +108,10 @@ namespace AspNetCoreMvcClient.Infraestructure
             {
                 UserId = userId,
                 LastActivity = DateTimeOffset.UtcNow,
-                Value = SerializeToBytes(ticket),
+                Value = dataProtector.Protect(SerializeToBytes(ticket)),
                 Expires = ticket.Properties.ExpiresUtc
             };
-           
+
             context.AuthenticationTickets.Add(authenticationTicket);
             await context.SaveChangesAsync();
 

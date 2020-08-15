@@ -54,7 +54,7 @@ namespace AspNetCoreMvcClient
             {
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 options.SlidingExpiration = true;
-                options.SessionStore = new TicketStore(services);
+                options.SessionStore = new TicketStore(services, DataProtectionProvider.Create(this.GetType().FullName));
             })
             .AddOpenIdConnect("oidc", options =>
             {
