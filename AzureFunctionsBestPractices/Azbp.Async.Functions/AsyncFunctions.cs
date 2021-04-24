@@ -132,14 +132,14 @@ namespace Azbp.Async.Functions
                 switch (commandType)
                 {
                     case CommandType.CallAzureFunctionDirectly:
-                        log.LogInformation($"Calling async method using activity with retry options.");
+                        log.LogInformation($"Calling function directly.");
                         await CallAzureFunctionDirectly(log);
-                        log.LogInformation($"Async method using activity called.");
+                        log.LogInformation($"Function called.");
                         break;
                     case CommandType.CallAzureFunctionSendingMessage:
-                        log.LogInformation($"Calling async method in orchestrator directly.");
+                        log.LogInformation($"Calling function using queue.");
                         await CallAzureFunctionSendingMessage(log);
-                        log.LogInformation($"Async method called.");
+                        log.LogInformation($"Function called.");
                         break;
                 }
 
