@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Azbp.ErrorHandling.Functions": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "CosmosDb:DatabaseName": "azbp",
+        "ConnectionStrings:CosmosDb": "AccountEndpoint=https://azbp-cosmosdb-demo.documents.azure.com:443/;AccountKey=RKnVngXfB7M7ZOgXWTxZXwX4H02Vp1pqnSFRzeBmWlKtxV0rTWN5T65dYfSbONE35nEYRNhPPCcKlX8vqCLeFQ==;",
+        "CosmosDb:ContainerName": "demo"
+      }
+    }
+  }
+}

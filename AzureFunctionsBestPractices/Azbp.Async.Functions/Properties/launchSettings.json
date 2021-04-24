@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Azbp.Async.Functions": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ConnectionStrings:QueueDemo": "UseDevelopmentStorage=true",
+        "AppSettings:QueueName": "demo"
+      }
+    }
+  }
+}

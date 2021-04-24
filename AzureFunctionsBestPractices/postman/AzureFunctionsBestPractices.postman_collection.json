@@ -1,0 +1,475 @@
+{
+	"info": {
+		"_postman_id": "f11953fa-a5ef-4d19-9b65-8a4b8b8704f2",
+		"name": "AzureFunctionsBestPractices",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Async",
+			"item": [
+				{
+					"name": "Call Azure Durable Function async and sync",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7071/api/RunOrchestratorHttp?commandType=CallAsyncWithActivity",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"RunOrchestratorHttp"
+							],
+							"query": [
+								{
+									"key": "commandType",
+									"value": "CallAsyncWithActivity"
+								},
+								{
+									"key": "commandType",
+									"value": "CallAsyncWithoutActivity",
+									"disabled": true
+								},
+								{
+									"key": "commandType",
+									"value": "PassingNonSerializableModel",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Durable Function async to queue or directly",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7071/api/CallAzureFunction?commandType=CallAzureFunctionSendingMessage",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"CallAzureFunction"
+							],
+							"query": [
+								{
+									"key": "commandType",
+									"value": "CallAzureFunctionSendingMessage"
+								},
+								{
+									"key": "commandType",
+									"value": "CallAzureFunctionDirectly",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ErrorHandling",
+			"item": [
+				{
+					"name": "Call Azure Function simplest error handling",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7071/api/Simplest?exceptionType=ArgumentException",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"Simplest"
+							],
+							"query": [
+								{
+									"key": "exceptionType",
+									"value": "ArgumentException"
+								},
+								{
+									"key": "exceptionType",
+									"value": "ArgumentNullException",
+									"disabled": true
+								},
+								{
+									"key": "exceptionType",
+									"value": "InvalidOperationException",
+									"disabled": true
+								},
+								{
+									"key": "exceptionType",
+									"value": "OutOfMemoryException",
+									"disabled": true
+								},
+								{
+									"key": "exceptionType",
+									"value": "ApplicationException",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Function retry option FixedDelayRetry",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7071/api/FixedDelayRetry",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"FixedDelayRetry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Function retry option ExponentialBackoffRetry",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7071/api/ExponentialBackoffRetry",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"ExponentialBackoffRetry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Durable Function retry option in Activity",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:7071/api/RunOrchestratorRetry",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"RunOrchestratorRetry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Function and validate body",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"{{$guid}}\",\r\n    \"name\": \"Name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7071/api/ValidateRequestBody",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"ValidateRequestBody"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Function and create document in Azure CosmosDb",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": \"1\",\r\n    \"name\": \"Name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7071/api/Idempotency",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"Idempotency"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Monitoring",
+			"item": [
+				{
+					"name": "Custom event and monitoring",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"David\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7071/api/MonitoringFunction",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"MonitoringFunction"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Security",
+			"item": [
+				{
+					"name": "Get AAD token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, () => {\r",
+									"    pm.response.to.not.be.error;\r",
+									"    pm.response.to.not.have.jsonBody('error');\r",
+									"});\r",
+									"pm.globals.set(\"AccessToken\", pm.response.json().access_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								},
+								{
+									"key": "resource",
+									"value": "{{resource}}",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{client_id}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{client_secret}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://login.microsoftonline.com/92cf6300-1c93-4b01-9a58-9603b66b404d/oauth2/token",
+							"protocol": "https",
+							"host": [
+								"login",
+								"microsoftonline",
+								"com"
+							],
+							"path": [
+								"92cf6300-1c93-4b01-9a58-9603b66b404d",
+								"oauth2",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Function secured with Azure AD",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AccessToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://localhost:7071/api/AzureAd",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"AzureAd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Function secured with Azure AD and get ConnectionString from Azure Key Vault",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AccessToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:7071/api/KeyVault?code={{functionCode}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"KeyVault"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "{{functionCode}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Call Azure Function secured with Azure AD and connect Azure CosmosDb using Managed Identities",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{AccessToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "http://localhost:7071/api/CosmosDb?code={{functionCode}}&id=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7071",
+							"path": [
+								"api",
+								"CosmosDb"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "{{functionCode}}"
+								},
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
