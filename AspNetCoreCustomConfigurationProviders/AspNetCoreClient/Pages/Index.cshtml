@@ -1,0 +1,18 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<style>
+    body {
+        background-color: @ViewData["BackgroundColor"]
+    }
+    h1 {
+        color: @ViewData["FontColor"];
+        font-size: @ViewData["FontSize"]px;
+    }
+</style>
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Message"]</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
