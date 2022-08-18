@@ -8,13 +8,11 @@ public class SqlServerConfigurationProvider : ConfigurationProvider, IDisposable
 {
     private readonly SqlServerConfigurationSource? source;
     private readonly string? query;
-    private readonly string? prefix;
     private readonly IDisposable? changeTokenRegistration;
 
-    public SqlServerConfigurationProvider(SqlServerConfigurationSource source, string? prefix)
+    public SqlServerConfigurationProvider(SqlServerConfigurationSource source)
     {
         this.source = source;
-        this.prefix = prefix;
         query = this.source?.CustomQuery; 
 
         if (this.source?.SqlServerWatcher is not null)
@@ -39,9 +37,9 @@ public class SqlServerConfigurationProvider : ConfigurationProvider, IDisposable
         { 
             while (reader?.Read() == true)
             {
-                data.Add(!string.IsNullOrWhiteSpace(prefix) ?
-                         $"{prefix}:{reader[0]}":
-                         reader[0].ToString()!, reader[1].ToString()!);
+                data.Add(!string.IsNullOrWhiteSpace(source?.Prefix) ?
+                         $"{source?.Prefix}:{reader[source?.KeyColumn]}":
+                         reader[$"{source?.KeyColumn}"].ToString()!, reader[$"{source?.ValueColumn}"].ToString()!);
             }
         }                   
 
