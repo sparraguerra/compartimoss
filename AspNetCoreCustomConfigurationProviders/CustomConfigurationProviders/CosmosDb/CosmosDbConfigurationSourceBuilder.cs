@@ -1,4 +1,7 @@
-﻿namespace CustomConfigurationProviders.CosmosDb;
+﻿using CustomConfigurationProviders.SqlServer;
+using System.Data.Common;
+
+namespace CustomConfigurationProviders.CosmosDb;
 
 public interface ICosmosDbConfigurationSourceBuilder
 {
@@ -9,8 +12,6 @@ public interface ICosmosDbConfigurationSourceBuilder
     ICosmosDbConfigurationSourceBuilder UseDatabase(string database);
     ICosmosDbConfigurationSourceBuilder WithPrefix(string prefix);
     ICosmosDbConfigurationSourceBuilder EnableChangeFeed();
-
-
     CosmosDbConfigurationSource Build();
 }
 
@@ -29,6 +30,21 @@ public class CosmosDbConfigurationSourceBuilder : ICosmosDbConfigurationSourceBu
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new ArgumentNullException(connectionString, $"Connection string could not be null or empty!");
+        }
+
+        DbConnectionStringBuilder builder = new()
+        {
+            ConnectionString = connectionString
+        };
+
+        if (builder.TryGetValue("AccountKey", out var key))
+        {
+            AuthKey = key.ToString();
+        }
+
+        if (builder.TryGetValue("AccountEndpoint", out var uri))
+        {
+            Endpoint =  uri.ToString();
         }
 
         ConnectionString = connectionString;
@@ -74,7 +90,14 @@ public class CosmosDbConfigurationSourceBuilder : ICosmosDbConfigurationSourceBu
 
     public ICosmosDbConfigurationSourceBuilder WithPrefix(string prefix)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(prefix))
+        {
+            throw new ArgumentNullException(prefix, $"Prefix could not be null or empty!");
+        }
+
+        Prefix = prefix;
+
+        return this;
     }
 
     public ICosmosDbConfigurationSourceBuilder EnableChangeFeed()
@@ -98,6 +121,38 @@ public class CosmosDbConfigurationSourceBuilder : ICosmosDbConfigurationSourceBu
 
     public CosmosDbConfigurationSource Build()
     {
-        throw new NotImplementedException();
+        var instance = new CosmosDbConfigurationSource();
+
+        if (ConnectionString != null)
+        {
+            instance.ConnectionString = ConnectionString;
+        }
+
+        if (Endpoint != null)
+        {
+            instance.Endpoint = Endpoint;
+        }
+
+        if (AuthKey != null)
+        {
+            instance.AuthKey = AuthKey;
+        }
+
+        if (ContainerName != null)
+        {
+            instance.ContainerName = ContainerName;
+        }
+
+        if (DatabaseName != null)
+        {
+            instance.DatabaseName = DatabaseName;
+        }
+
+        if (ChangeFeed != null)
+        {
+            instance.ChangeFeedWatcher = new CosmosDbChangeFeedProcessor();
+        }
+
+        return instance;
     }
 }

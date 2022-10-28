@@ -1,3 +1,4 @@
+using CustomConfigurationProviders.CosmosDb;
 using CustomConfigurationProviders.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,12 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 
 
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+var cosmosDbConfig = builder.Configuration.GetSection("CosmosDbConfig").Get<CustomConfigurationProviders.CosmosDb.CosmosDbConfig>();
 
+if (cosmosDbConfig is not null)
+{
+    builder.Configuration.AddCosmosDb(cosmosDbConfig);
+}
 
 // Add services to the container.
 builder.Services.AddRazorPages();

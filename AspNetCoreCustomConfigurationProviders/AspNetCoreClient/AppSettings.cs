@@ -4,7 +4,9 @@
     public string? BackgroundColor { get; set; }
     public string? FontSize { get; set; }
     public string? FontColor { get; set; }
-    
+
+    public SwaggerOptions? SwaggerOptions { get; set; }
+
 }
 
 public class SwaggerOptions

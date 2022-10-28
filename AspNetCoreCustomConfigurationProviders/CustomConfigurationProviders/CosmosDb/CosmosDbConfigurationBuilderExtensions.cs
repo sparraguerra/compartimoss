@@ -5,47 +5,81 @@ namespace CustomConfigurationProviders.CosmosDb;
 
 public static class CosmosDbConfigurationBuilderExtensions
 {
-    public static IConfigurationBuilder AddCosmosDB(
-            this IConfigurationBuilder configurationBuilder, CosmosDBClientSettings defaultSettings)
+    //public static IConfigurationBuilder AddCosmosDb(
+    //        this IConfigurationBuilder configurationBuilder, CosmosDBClientSettings defaultSettings)
+    //{
+    //    if (defaultSettings == null)
+    //    {
+    //        throw new ArgumentNullException(nameof(defaultSettings));
+    //    }
+
+    //    configurationBuilder.Add(new CosmosDBConfigurationProvider(defaultSettings));
+    //    return configurationBuilder;
+    //}
+
+
+    //public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder configurationBuilder,
+    //    Action<CosmosDBClientSettings, IConfiguration> cosmosDbBuilderAction)
+    //{
+    //    var settings = new CosmosDBClientSettings();
+
+    //    setterFn.Invoke(settings, configurationBuilder.Build());
+
+    //    return configurationBuilder.AddCosmosDB(settings);
+    //}
+
+
+    public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder builder, CosmosDbConfig cosmosDbConfig)
     {
-        if (defaultSettings == null)
+        if (cosmosDbConfig == null)
         {
-            throw new ArgumentNullException(nameof(defaultSettings));
+            throw new ArgumentNullException(nameof(cosmosDbConfig));
         }
 
-        configurationBuilder.Add(new CosmosDBConfigurationProvider(defaultSettings));
-        return configurationBuilder;
+        return builder.AddCosmosDb(cosmosDbBuilder =>
+        {
+            if (!string.IsNullOrWhiteSpace(cosmosDbConfig.ConnectionString))
+            {
+                cosmosDbBuilder.UseConnectionString(cosmosDbConfig.ConnectionString);
+            }
+            if (!string.IsNullOrWhiteSpace(cosmosDbConfig.Endpoint))
+            {
+                cosmosDbBuilder.UseEndpoint(cosmosDbConfig.Endpoint);
+            }
+            if (!string.IsNullOrWhiteSpace(cosmosDbConfig.AuthKey))
+            {
+                cosmosDbBuilder.UseAuthKey(cosmosDbConfig.AuthKey);
+            }
+            if (!string.IsNullOrWhiteSpace(cosmosDbConfig.DatabaseName))
+            {
+                cosmosDbBuilder.UseDatabase(cosmosDbConfig.DatabaseName);
+            }
+            if (!string.IsNullOrWhiteSpace(cosmosDbConfig.ContainerName))
+            {
+                cosmosDbBuilder.UseContainer(cosmosDbConfig.ContainerName);
+            }
+        });
     }
+                                           
 
-
-    public static IConfigurationBuilder AddCosmosDB(this IConfigurationBuilder configurationBuilder,
-        Action<CosmosDBClientSettings, IConfiguration> cosmosDbBuilderAction)
-    {
-        var settings = new CosmosDBClientSettings();
-
-        setterFn.Invoke(settings, configurationBuilder.Build());
-
-        return configurationBuilder.AddCosmosDB(settings);
-    }
-
-
-    public static IConfigurationBuilder AddSqlServer(this IConfigurationBuilder builder, string connectionString) =>
-                                           builder.AddSqlServer(sqlBuilder => sqlBuilder.UseConnectionString(connectionString));
-
-    public static IConfigurationBuilder AddSqlServer(this IConfigurationBuilder builder, string connectionString, TimeSpan? refreshInterval = null) =>
-                                            builder.Add(new SqlServerConfigurationSource
+    public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder builder, CosmosDbConfig cosmosDbConfig, bool? enableChangeFeed = null) =>
+                                            builder.Add(new CosmosDbConfigurationSource
                                             {
-                                                ConnectionString = connectionString,
-                                                SqlServerWatcher = refreshInterval.HasValue ?
-                                                                   new SqlServerWatcher(refreshInterval.Value) :
-                                                                   null
+                                                ConnectionString = cosmosDbConfig.ConnectionString,
+                                                AuthKey = cosmosDbConfig.AuthKey,  
+                                                Endpoint = cosmosDbConfig.Endpoint,
+                                                DatabaseName = cosmosDbConfig.DatabaseName,
+                                                ContainerName = cosmosDbConfig.ContainerName
+                                                //SqlServerWatcher = enableChangeFeed.HasValue ?
+                                                //                   new SqlServerWatcher(refreshInterval.Value) :
+                                                //                   null
                                             });
 
-    public static IConfigurationBuilder AddSqlServer(this IConfigurationBuilder builder, Action<ISqlServerConfigurationSourceBuilder> sqlBuilderAction)
+    public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder builder, Action<ICosmosDbConfigurationSourceBuilder> cosmosDbBuilderAction)
     {
-        var sqlBuilder = new SqlServerConfigurationSourceBuilder();
-        sqlBuilderAction(sqlBuilder);
-        var source = sqlBuilder.Build();
+        var cosmosDbBuilder = new CosmosDbConfigurationSourceBuilder();
+        cosmosDbBuilderAction(cosmosDbBuilder);
+        var source = cosmosDbBuilder.Build();
         return builder.Add(source);
     }
 }
