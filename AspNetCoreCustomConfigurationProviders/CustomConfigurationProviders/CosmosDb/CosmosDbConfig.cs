@@ -3,13 +3,10 @@
 public class CosmosDbConfig
 {  
     public string? ConnectionString { get; set; }
-
     public string? Endpoint { get; set; }
-
     public string? AuthKey { get; set; }
-
     public string? DatabaseName { get; set; }
-
     public string? ContainerName { get; set; }
     public string? Prefix { get; set; }
+    public bool? ChangeFeed { get; set; }
 }

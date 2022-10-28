@@ -12,6 +12,5 @@ public class CosmosDbConfigurationSource : IConfigurationSource
     public string? DatabaseName { get; set; } = "settings";
     public string? Prefix { get; set; }
     public bool? ChangeFeed { get; set; }
-    internal ICosmosDbChangeFeedProcessor? ChangeFeedWatcher { get; set; }
     public IConfigurationProvider Build(IConfigurationBuilder builder) => new CosmosDbConfigurationProvider(this);
 }

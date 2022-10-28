@@ -37,6 +37,10 @@ public static class CosmosDbConfigurationBuilderExtensions
             {
                 cosmosDbBuilder.WithPrefix(cosmosDbConfig.Prefix);
             }
+            if (cosmosDbConfig?.ChangeFeed == true)
+            {
+                cosmosDbBuilder.EnableChangeFeed();
+            }
         });
     }
                                            
@@ -50,9 +54,7 @@ public static class CosmosDbConfigurationBuilderExtensions
                                                 DatabaseName = cosmosDbConfig.DatabaseName,
                                                 ContainerName = cosmosDbConfig.ContainerName,
                                                 Prefix = cosmosDbConfig.Prefix,
-                                                ChangeFeedWatcher = enableChangeFeed.HasValue ?
-                                                                   new CosmosDbChangeFeedProcessor() :
-                                                                   null
+                                                ChangeFeed = cosmosDbConfig.ChangeFeed
                                             });
 
     public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder builder, Action<ICosmosDbConfigurationSourceBuilder> cosmosDbBuilderAction)

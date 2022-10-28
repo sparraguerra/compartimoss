@@ -1,25 +1,45 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using System.Configuration;
 
 namespace CustomConfigurationProviders.CosmosDb;
 
 public class CosmosDbConfigurationProvider : ConfigurationProvider
 {
+    private CosmosClient cosmosClient;
+    private const string instanceName = "host";
+    private const string processorName = "changeFeedSample";
+    private const string leaseContainerName = "leases";
+    ChangeFeedProcessor? processor = null;
     private readonly CosmosDbConfigurationSource? source; 
 
     public CosmosDbConfigurationProvider(CosmosDbConfigurationSource source)
     {
-        this.source = source ?? throw new ArgumentNullException(nameof(source));         
-    }
+        this.source = source ?? throw new ArgumentNullException(nameof(source));
 
-    public override void Load()
-    {
-        var client = !string.IsNullOrWhiteSpace(source?.ConnectionString) ?
+        if(string.IsNullOrWhiteSpace(source.DatabaseName))
+        {
+            throw new ArgumentException("DatabaseName");
+        }
+        if (string.IsNullOrWhiteSpace(source.ContainerName))
+        {
+            throw new ArgumentException("ContainerName");
+        }
+        
+        cosmosClient = !string.IsNullOrWhiteSpace(source?.ConnectionString) ?
                                 new CosmosClient(source?.ConnectionString) :
                                 new CosmosClient(source?.Endpoint, source?.AuthKey);
 
-        var container = client.GetContainer(source?.DatabaseName, source?.ContainerName);
+        if (source?.ChangeFeed == true)
+        {
+            processor = StartChangeFeedProcessorAsync(source.DatabaseName, leaseContainerName, source.ContainerName).GetAwaiter().GetResult(); ;
+        }
+    }
+
+    public override void Load()
+    {        
+        var container = cosmosClient.GetContainer(source?.DatabaseName, source?.ContainerName);
 
         var queryOptions = new QueryRequestOptions { MaxItemCount = -1 };
         QueryDefinition query = new($"SELECT * FROM {source?.ContainerName} c");
@@ -75,5 +95,23 @@ public class CosmosDbConfigurationProvider : ConfigurationProvider
         }
 
         return properties;
+    }
+
+    private async Task<ChangeFeedProcessor> StartChangeFeedProcessorAsync(string databaseName, string leaseContainerName, string sourceContainerName)
+    {
+        Container leaseContainer = cosmosClient.GetContainer(databaseName, leaseContainerName);
+        ChangeFeedProcessor changeFeedProcessor = cosmosClient.GetContainer(databaseName, sourceContainerName)
+            .GetChangeFeedProcessorBuilder<JObject>(processorName: processorName, onChangesDelegate: HandleChangesAsync)
+            .WithInstanceName(instanceName)
+            .WithLeaseContainer(leaseContainer)
+            .Build();
+         
+        await changeFeedProcessor.StartAsync(); 
+        return changeFeedProcessor;
+    }
+
+    private async Task HandleChangesAsync(ChangeFeedProcessorContext context, IReadOnlyCollection<JObject> changes, CancellationToken cancellationToken)
+    {
+        this.Load();
     }
 }

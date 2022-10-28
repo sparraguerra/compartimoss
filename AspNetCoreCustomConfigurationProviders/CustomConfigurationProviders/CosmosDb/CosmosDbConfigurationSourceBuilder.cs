@@ -154,7 +154,7 @@ public class CosmosDbConfigurationSourceBuilder : ICosmosDbConfigurationSourceBu
 
         if (ChangeFeed != null)
         {
-            instance.ChangeFeedWatcher = new CosmosDbChangeFeedProcessor();
+            instance.ChangeFeed = ChangeFeed;
         }
 
         return instance;
