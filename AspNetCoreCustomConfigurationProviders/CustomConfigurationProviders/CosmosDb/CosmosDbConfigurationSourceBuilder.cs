@@ -1,5 +1,4 @@
-﻿using CustomConfigurationProviders.SqlServer;
-using System.Data.Common;
+﻿using System.Data.Common;
 
 namespace CustomConfigurationProviders.CosmosDb;
 
@@ -146,6 +145,11 @@ public class CosmosDbConfigurationSourceBuilder : ICosmosDbConfigurationSourceBu
         if (DatabaseName != null)
         {
             instance.DatabaseName = DatabaseName;
+        }
+
+        if (Prefix != null)
+        {
+            instance.Prefix = Prefix;
         }
 
         if (ChangeFeed != null)

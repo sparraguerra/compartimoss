@@ -17,13 +17,15 @@ if (!string.IsNullOrWhiteSpace(connectionString))
 }
 
 
-builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+// get cosmos db configuration provider data from appSettings
 var cosmosDbConfig = builder.Configuration.GetSection("CosmosDbConfig").Get<CustomConfigurationProviders.CosmosDb.CosmosDbConfig>();
 
 if (cosmosDbConfig is not null)
 {
     builder.Configuration.AddCosmosDb(cosmosDbConfig);
 }
+builder.Services.Configure<SwaggerOptions>(builder.Configuration.GetSection("SwaggerOptions"));
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
 // Add services to the container.
 builder.Services.AddRazorPages();

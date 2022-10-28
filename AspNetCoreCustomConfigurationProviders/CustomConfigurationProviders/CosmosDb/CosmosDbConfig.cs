@@ -11,4 +11,5 @@ public class CosmosDbConfig
     public string? DatabaseName { get; set; }
 
     public string? ContainerName { get; set; }
+    public string? Prefix { get; set; }
 }

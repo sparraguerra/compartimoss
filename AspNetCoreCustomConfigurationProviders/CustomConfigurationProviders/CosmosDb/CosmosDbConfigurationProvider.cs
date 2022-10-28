@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 
@@ -24,44 +23,38 @@ public class CosmosDbConfigurationProvider : ConfigurationProvider
 
         var queryOptions = new QueryRequestOptions { MaxItemCount = -1 };
         QueryDefinition query = new($"SELECT * FROM {source?.ContainerName} c");
-        Dictionary<string, object> results = new();
-        using FeedIterator<Dictionary<string, object>> resultSetIterator = 
-                    container.GetItemQueryIterator<Dictionary<string, object>>(query, requestOptions: new QueryRequestOptions { MaxConcurrency = 1 });
+
+        using var resultSetIterator = 
+                    container.GetItemQueryIterator<JObject>(query, requestOptions: new QueryRequestOptions { MaxConcurrency = 1 });
 
         while (resultSetIterator.HasMoreResults)
         {
-            FeedResponse<Dictionary<string, object>> response = Task.Run(async () => await resultSetIterator.ReadNextAsync()).Result;
+            var response = Task.Run(async () => await resultSetIterator.ReadNextAsync()).Result;
 
             foreach (var result in response)
-            {
-                var configurationObject = JObject.Parse(result.ToString());
-                var allConfiguration = ParseProperties(configurationObject);
+            { 
+                var allConfiguration = ParseProperties(result);
                 foreach (var configurationItem in allConfiguration)
                 {
-                    Data[configurationItem.Key] = "";// configurationItem.Value;
+                    var key = !string.IsNullOrWhiteSpace(source?.Prefix) ?
+                              $"{source?.Prefix}:{configurationItem.Key}" :
+                              configurationItem.Key;
+                    Data[key] =  configurationItem.Value; 
                 }
             }
-
-
-            //var configurationObject = JObject.Parse(response.ToString());
-            //var allConfiguration = ParseProperties(configurationObject);
-            //foreach (var configurationItem in allConfiguration)
-            //{
-            //    Data[configurationItem.Key] = "";// configurationItem.Value;
-            //}
         }
     }
 
-    private Dictionary<string, object> ParseProperties(JObject? result)
+    private Dictionary<string, string> ParseProperties(JObject? result)
     {
-        Dictionary<string, object> properties = new();
+        Dictionary<string, string> properties = new();
         if (result is null)
         {
             return properties;
         }
         foreach (var prop in result.Properties())
         {
-            if (prop.Name.StartsWith("_"))
+            if (prop.Name.StartsWith("_") || prop.Name.ToLowerInvariant() == "id")
             {
                 continue;
             }
@@ -83,5 +76,4 @@ public class CosmosDbConfigurationProvider : ConfigurationProvider
 
         return properties;
     }
-
 }

@@ -1,34 +1,9 @@
-﻿using CustomConfigurationProviders.SqlServer;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace CustomConfigurationProviders.CosmosDb;
 
 public static class CosmosDbConfigurationBuilderExtensions
 {
-    //public static IConfigurationBuilder AddCosmosDb(
-    //        this IConfigurationBuilder configurationBuilder, CosmosDBClientSettings defaultSettings)
-    //{
-    //    if (defaultSettings == null)
-    //    {
-    //        throw new ArgumentNullException(nameof(defaultSettings));
-    //    }
-
-    //    configurationBuilder.Add(new CosmosDBConfigurationProvider(defaultSettings));
-    //    return configurationBuilder;
-    //}
-
-
-    //public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder configurationBuilder,
-    //    Action<CosmosDBClientSettings, IConfiguration> cosmosDbBuilderAction)
-    //{
-    //    var settings = new CosmosDBClientSettings();
-
-    //    setterFn.Invoke(settings, configurationBuilder.Build());
-
-    //    return configurationBuilder.AddCosmosDB(settings);
-    //}
-
-
     public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder builder, CosmosDbConfig cosmosDbConfig)
     {
         if (cosmosDbConfig == null)
@@ -58,6 +33,10 @@ public static class CosmosDbConfigurationBuilderExtensions
             {
                 cosmosDbBuilder.UseContainer(cosmosDbConfig.ContainerName);
             }
+            if (!string.IsNullOrWhiteSpace(cosmosDbConfig.Prefix))
+            {
+                cosmosDbBuilder.WithPrefix(cosmosDbConfig.Prefix);
+            }
         });
     }
                                            
@@ -69,10 +48,11 @@ public static class CosmosDbConfigurationBuilderExtensions
                                                 AuthKey = cosmosDbConfig.AuthKey,  
                                                 Endpoint = cosmosDbConfig.Endpoint,
                                                 DatabaseName = cosmosDbConfig.DatabaseName,
-                                                ContainerName = cosmosDbConfig.ContainerName
-                                                //SqlServerWatcher = enableChangeFeed.HasValue ?
-                                                //                   new SqlServerWatcher(refreshInterval.Value) :
-                                                //                   null
+                                                ContainerName = cosmosDbConfig.ContainerName,
+                                                Prefix = cosmosDbConfig.Prefix,
+                                                ChangeFeedWatcher = enableChangeFeed.HasValue ?
+                                                                   new CosmosDbChangeFeedProcessor() :
+                                                                   null
                                             });
 
     public static IConfigurationBuilder AddCosmosDb(this IConfigurationBuilder builder, Action<ICosmosDbConfigurationSourceBuilder> cosmosDbBuilderAction)
