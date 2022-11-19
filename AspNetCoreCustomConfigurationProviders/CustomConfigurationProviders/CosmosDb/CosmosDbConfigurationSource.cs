@@ -1,5 +1,4 @@
-﻿using CustomConfigurationProviders.SqlServer;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace CustomConfigurationProviders.CosmosDb;
 
