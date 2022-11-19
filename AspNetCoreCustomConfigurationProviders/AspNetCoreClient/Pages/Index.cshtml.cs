@@ -19,7 +19,9 @@ namespace AspNetCoreMvcClient.Pages
             ViewData["Message"] = _appSettings.Message;
             ViewData["BackgroundColor"] = _appSettings.BackgroundColor;
             ViewData["FontSize"] = _appSettings.FontSize;
-            ViewData["FontColor"] = _appSettings.FontColor; 
+            ViewData["FontColor"] = _appSettings.FontColor;
+            ViewData["SwaggerOptions:ApiName"] = _appSettings.SwaggerOptions?.ApiName;
+            ViewData["SwaggerOptions:ApiVersion"] = _appSettings.SwaggerOptions?.ApiVersion;
         }
     }
 }
