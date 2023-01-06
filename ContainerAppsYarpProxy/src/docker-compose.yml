@@ -1,0 +1,71 @@
+version: '3.4'
+
+services:
+  demo-apigateway:
+    image: ${DOCKER_REGISTRY-}demoapigateway
+    build:
+      context: .
+      dockerfile: Demo.ApiGateway/Dockerfile
+    ports:
+      - "50100:50100"
+  demo-apigateway-dapr:
+    image: "daprio/daprd:1.9.5"
+    network_mode: "service:demo-apigateway"
+    command: ["./daprd",
+      "--app-id", "demo-apigateway",
+      "--app-port", "80",
+      "--dapr-http-port", "3601",
+      "--dapr-grpc-port", "60001",
+      "--components-path", "/components",
+      "--log-level", "debug"
+      ]
+    volumes:
+      - "./dapr/components/:/components"
+    depends_on:
+      - demo-apigateway
+
+  demo-customers-api:
+    image: ${DOCKER_REGISTRY-}democustomersapi
+    build:
+      context: .
+      dockerfile: Demo.Customers.Api/Dockerfile
+    ports:
+      - "50101:50101"
+  demo-customers-api-dapr:
+    image: "daprio/daprd:1.9.5"
+    network_mode: "service:demo-customers-api"
+    command: ["./daprd",
+      "--app-id", "demo-customers-api",
+      "--app-port", "80",
+      "--dapr-http-port", "3602",
+      "--dapr-grpc-port", "60002",
+      "--components-path", "/components",
+      "--log-level", "debug"
+      ]
+    volumes:
+      - "./dapr/components/:/components"
+    depends_on:
+      - demo-customers-api
+
+  demo-products-api:
+    image: ${DOCKER_REGISTRY-}demoproductsapi
+    build:
+      context: .
+      dockerfile: Demo.Products.Api/Dockerfile
+    ports:
+      - "50102:50102"
+  demo-products-api-dapr:
+    image: "daprio/daprd:1.9.5"
+    network_mode: "service:demo-products-api"
+    command: ["./daprd",
+      "--app-id", "demo-products-api",
+      "--app-port", "80",
+      "--dapr-http-port", "3603",
+      "--dapr-grpc-port", "60003",
+      "--components-path", "/components",
+      "--log-level", "debug"
+      ]
+    volumes:
+      - "./dapr/components/:/components"
+    depends_on:
+      - demo-products-api 
