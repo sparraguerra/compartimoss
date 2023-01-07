@@ -1,6 +1,7 @@
 ﻿using Demo.ApiGateway.Configuration;
 using Demo.ApiGateway.Middleware;
 using Demo.ApiGateway.Providers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Demo.ApiGateway.Extensions;
 
@@ -44,8 +45,8 @@ public static class ReverseProxyExtensions
     {
         app.UseRouting();
         app.UseCors("CorsPolicy");
-       // app.UseAuthentication();
-       // app.UseAuthorization();
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         app.UseYarp();
     }
