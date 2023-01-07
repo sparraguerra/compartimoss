@@ -5,12 +5,14 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - DAPR_HTTP_PORT=3602
+      - DAPR_HTTP_PORT=3601
       - DAPR_GRPC_PORT=60001
     ports:
       - "80"
+      - "443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
   demo-customers-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -19,8 +21,10 @@ services:
       - DAPR_GRPC_PORT=60002
     ports:
       - "80"
+      - "443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
   demo-products-api:
     environment:
@@ -30,5 +34,7 @@ services:
       - DAPR_GRPC_PORT=60003
     ports:
       - "80"
+      - "443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
