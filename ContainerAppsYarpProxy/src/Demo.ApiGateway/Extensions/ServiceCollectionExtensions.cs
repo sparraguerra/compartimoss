@@ -1,6 +1,7 @@
 ﻿using Demo.ApiGateway.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Demo.ApiGateway.Extensions;
@@ -27,22 +28,19 @@ public static class ServiceCollectionextensions
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddMicrosoftIdentityWebApi(options =>
+        .AddJwtBearer(options =>
         {
-            configuration.Bind("AzureAd", options);
+            options.Audience = configuration["AzureAd:Audience"];
             options.TokenValidationParameters = new TokenValidationParameters
-            { 
+            {
                 ValidateIssuer = true,
-                ValidateLifetime = true,
-                ValidateAudience = true,
-                ValidAudience = options.Audience,
                 ValidIssuer = configuration["AzureAd:Issuer"],
-                ValidateIssuerSigningKey = false,
-                RequireExpirationTime = true
+                ValidateAudience = true,
+                ValidAudience = configuration["AzureAd:Audience"],
+                ValidateLifetime = true
             };
-        },
-        options => { configuration.Bind("AzureAd", options); });
-
+            options.Authority = configuration["AzureAd:Issuer"];
+        });       
 
         return services;
     }

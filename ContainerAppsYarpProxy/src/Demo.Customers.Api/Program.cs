@@ -36,8 +36,8 @@ app.MapGet("/api/customers/{id}", async (int id, ICustomersService customerServi
 .Produces<CustomerResponse>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound)
 .WithName("GetCustomerById");
 
-app.MapPost("/api/customers", async (CustomerRequest request, ICustomersService customerService)
-    => await customerService.CreateCustomer(request))
+app.MapPost("/api/customers", async (CustomerRequest request, ICustomersService customerService) => 
+        await customerService.CreateCustomer(request))
 .Produces<CustomerResponse>(StatusCodes.Status200OK)
 .WithName("CreateCustomer");
 

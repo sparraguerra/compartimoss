@@ -26,14 +26,13 @@ public class ProductsService : IProductsService
         var product = new Product()
         {
             Name = request.Name,
-            Surname = request.Surname,
-            Email = request.Email,
-            DateOfBirth = request.DateOfBirth
+            Description = request.Description,
+            UnitPrice = request.UnitPrice
         };
 
         _ = await dbContext.Set<Product>().AddAsync(product);
         await dbContext.SaveChangesAsync(); 
-        return new ProductResponse(product.Id, product.Name, product.Surname, product.Email, product.DateOfBirth);
+        return new ProductResponse(product.Id, product.Name, product.Description, product.UnitPrice);
     }
 
     public async Task DeleteProduct(int id)
@@ -54,7 +53,7 @@ public class ProductsService : IProductsService
             return default;            
         }
 
-        return new ProductResponse(product.Id, product.Name, product.Surname, product.Email, product.DateOfBirth);
+        return new ProductResponse(product.Id, product.Name, product.Description, product.UnitPrice);
     }
 
     public async Task<IEnumerable<ProductResponse?>> GetProducts()
@@ -68,7 +67,7 @@ public class ProductsService : IProductsService
             var items = new List<ProductResponse>();
             foreach (var product in products)
             {
-                items.Add(new ProductResponse(product.Id, product.Name, product.Surname, product.Email, product.DateOfBirth));
+                items.Add(new ProductResponse(product.Id, product.Name, product.Description, product.UnitPrice));
             }
 
             return items;
@@ -83,12 +82,11 @@ public class ProductsService : IProductsService
             return default;
         }
         product.Name = request.Name;
-        product.Surname = request.Surname;
-        product.Email = request.Email;
-        product.DateOfBirth = request.DateOfBirth;
+        product.Description = request.Description; 
+        product.UnitPrice = request.UnitPrice;
 
         dbContext.Set<Product>().Update(product);
         await dbContext.SaveChangesAsync();
-        return new ProductResponse(product.Id, product.Name, product.Surname, product.Email, product.DateOfBirth);
+        return new ProductResponse(product.Id, product.Name, product.Description, product.UnitPrice);
     }
 }
