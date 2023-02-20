@@ -6,10 +6,11 @@ using Demo.Products.Api.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDaprClient();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApiContext>(options => options.UseInMemoryDatabase("api"));
+builder.Services.AddDbContext<ApiDbContext>(options => options.UseInMemoryDatabase("api"));
 builder.Services.AddScoped<IProductsService, ProductsService>();
 
 var app = builder.Build();
@@ -28,9 +29,9 @@ app.MapGet("/api/products", async (IProductsService productService) =>
 
 app.MapGet("/api/products/{id}", async (int id, IProductsService productService) =>
 {
-    var customer = await productService.GetProductById(id);
-    if (customer is null) return Results.NotFound();
-    return Results.Ok(customer);
+    var product = await productService.GetProductById(id);
+    if (product is null) return Results.NotFound();
+    return Results.Ok(product);
 })
 .Produces<ProductResponse>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound)
 .WithName("GetProductById");
@@ -42,9 +43,9 @@ app.MapPost("/api/products", async (ProductRequest request, IProductsService pro
 
 app.MapPut("/api/products/{id}", async (int id, ProductRequest request, IProductsService productService) =>
 {
-    var customer = await productService.UpdateProduct(id, request);
-    if (customer is null) return Results.NotFound();
-    return Results.Ok(customer);
+    var product = await productService.UpdateProduct(id, request);
+    if (product is null) return Results.NotFound();
+    return Results.Ok(product);
 })
 .Produces<ProductResponse>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound)
 .WithName("UpdateProduct");

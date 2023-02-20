@@ -1,7 +1,6 @@
 ﻿using Demo.ApiGateway.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
-using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Demo.ApiGateway.Extensions;

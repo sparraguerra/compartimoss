@@ -14,9 +14,9 @@ public interface ICustomersService
 }
 public class CustomersService : ICustomersService
 {
-    private readonly ApiContext dbContext;
+    private readonly ApiDbContext dbContext;
 
-    public CustomersService(ApiContext dbContext)
+    public CustomersService(ApiDbContext dbContext)
     {
         this.dbContext = dbContext;
     }

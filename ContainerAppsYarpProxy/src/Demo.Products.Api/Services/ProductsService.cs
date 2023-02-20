@@ -14,9 +14,9 @@ public interface IProductsService
 }
 public class ProductsService : IProductsService
 {
-    private readonly ApiContext dbContext;
+    private readonly ApiDbContext dbContext;
 
-    public ProductsService(ApiContext dbContext)
+    public ProductsService(ApiDbContext dbContext)
     {
         this.dbContext = dbContext;
     }

@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "demo-apigateway": "StartDebugging",
+        "demo-apigateway-dapr": "StartWithoutDebugging",
+        "demo-customers-api": "StartDebugging",
+        "demo-customers-api-dapr": "StartWithoutDebugging",
+        "demo-products-api": "StartDebugging",
+        "demo-products-api-dapr": "StartWithoutDebugging"
+      }
+    }
+  }
+}

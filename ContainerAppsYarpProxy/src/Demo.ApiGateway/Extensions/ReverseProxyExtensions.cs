@@ -13,6 +13,8 @@ public static class ReverseProxyExtensions
                         .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
                         .AddTransforms<DaprTransformProvider>();
 
+        builder.Services.AddDaprClient();
+
         builder.Services.AddAuthenticationDefault(configuration);
         builder.Services.AddAuthorization()
                         .AddCorsPolicy(configuration)
@@ -56,7 +58,7 @@ public static class ReverseProxyExtensions
         var httpEndpoint = DaprDefaults.GetDefaultHttpEndpoint();
         return configuration.AddInMemoryCollection(new[]
         {
-                new KeyValuePair<string, string>("ReverseProxy:Clusters:dapr-sidecar:Destinations:d1:Address", httpEndpoint!),
-            });
+            new KeyValuePair<string, string>("ReverseProxy:Clusters:dapr-sidecar:Destinations:d1:Address", httpEndpoint!),
+        });
     }
 }

@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDaprClient();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ApiContext>(options => options.UseInMemoryDatabase("api"));
+builder.Services.AddDbContext<ApiDbContext>(options => options.UseInMemoryDatabase("api"));
 builder.Services.AddScoped<ICustomersService, CustomersService>();
 
 var app = builder.Build();

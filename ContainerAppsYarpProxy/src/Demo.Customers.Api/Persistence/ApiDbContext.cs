@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Demo.Customers.Api.Persistence;
 
-public class ApiContext : DbContext
+public class ApiDbContext : DbContext
 {
     public DbSet<Customer>? Customers { get; set; }
 
-    public ApiContext(DbContextOptions<ApiContext> options)
+    public ApiDbContext(DbContextOptions<ApiDbContext> options)
         : base(options)
     { }
 
