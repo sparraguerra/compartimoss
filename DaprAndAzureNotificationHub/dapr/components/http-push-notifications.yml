@@ -8,4 +8,4 @@ spec:
   version: v1
   metadata:
   - name: url
-    value: https://casvi-ntfns-dev.servicebus.windows.net/casvi-ntf-dev
+    value: https://namespace.windows.net/notificationhubname
