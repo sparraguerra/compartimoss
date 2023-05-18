@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DaprAndAzureNotificationHub": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  daprandazurenotificationhub:
+    image: ${DOCKER_REGISTRY-}daprandazurenotificationhub
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  daprandazurenotificationhub-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:daprandazurenotificationhub"
+    command: ["./daprd",
+      "--app-id", "daprandazurenotificationhub",
+      "--app-port", "80",
+      "--components-path", "/components",
+      "--log-level", "debug",
+      "--dapr-http-max-request-size","16"
+      ]
+    volumes:
+      - "./dapr/components/:/components"
+    depends_on:
+      - daprandazurenotificationhub
