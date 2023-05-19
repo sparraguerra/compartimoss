@@ -5,7 +5,7 @@ namespace Demo.Products.Api.Persistence;
 
 public class ApiDbContext : DbContext
 {
-    public DbSet<Product>? Customers { get; set; }
+    public DbSet<Product>? Products { get; set; }
 
     public ApiDbContext(DbContextOptions<ApiDbContext> options)
         : base(options)
