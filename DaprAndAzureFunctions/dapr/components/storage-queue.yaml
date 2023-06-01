@@ -1,0 +1,15 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: storage-queue
+  
+spec:
+  type: bindings.azure.storagequeues
+  version: v1
+  metadata:
+  - name: storageAccount
+    value: "styarpdaprcontainerapp"
+  - name: storageAccessKey
+    value: "N5Zhx9QTm+0nEhl4U21IFiloec8o50B5CmMaNka0SmDVFVDd7UfUQJUioCbCbIHfa5Qhi+GuoNIz+AStcfEGHA=="
+  - name: queue
+    value: "receipts"

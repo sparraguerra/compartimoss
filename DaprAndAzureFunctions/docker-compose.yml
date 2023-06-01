@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  daprandazurefunctions:
+    image: ${DOCKER_REGISTRY-}daprandazurefunctions
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    ports:
+      - "3001:3001"
+
+  daprandazurefunctions-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:daprandazurefunctions"
+    command: ["./daprd",
+      "--app-id", "daprandazurefunctions",
+      "--app-port", "3001",
+      "--dapr-http-port", "3501",
+      "--components-path", "/components",
+      "--log-level", "debug",
+      "--dapr-http-max-request-size","16"
+      ]
+    volumes:
+      - "./dapr/components/:/components"
+    depends_on:
+      - daprandazurefunctions
