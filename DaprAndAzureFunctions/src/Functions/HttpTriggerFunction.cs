@@ -16,20 +16,19 @@ namespace DaprAndAzureFunctions.Functions;
 
 public class HttpTriggerFunction
 {
-    private readonly ILogger _logger;
+    private readonly ILogger logger;
 
     public HttpTriggerFunction(ILoggerFactory loggerFactory)
     {
-        _logger = loggerFactory.CreateLogger<HttpTriggerFunction>();
+        logger = loggerFactory.CreateLogger<HttpTriggerFunction>();
     }
 
     [FunctionName(nameof(SendMessageToQueue))]
-    public static async Task<IActionResult> SendMessageToQueue(
+    public async Task<IActionResult> SendMessageToQueue(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-        [DaprBinding(BindingName = "storage-queue", Operation = "create")] IAsyncCollector<JsonElement> messages,
-        ILogger log)
+        [DaprBinding(BindingName = "storage-queue", Operation = "create")] IAsyncCollector<JsonElement> messages)
     {
-        log.LogInformation("C# HTTP trigger function processed a request.");
+        logger.LogInformation("C# HTTP trigger function processed a request.");
 
         string? name = req.Query["name"];
 

@@ -7,22 +7,21 @@ namespace DaprAndAzureFunctions.Functions;
 
 public class DaprFunction
 {
-    private readonly ILogger _logger;
+    private readonly ILogger logger;
 
     public DaprFunction(ILoggerFactory loggerFactory)
     {
-        _logger = loggerFactory.CreateLogger<DaprFunction>();
+        logger = loggerFactory.CreateLogger<DaprFunction>();
     }
 
     [FunctionName(nameof(ConsumeMessageFromAzureStorageQueue))]
     public void ConsumeMessageFromAzureStorageQueue(
             // Note: the value of BindingName must match the binding name in components/storage-queue.yaml
-            [DaprBindingTrigger(BindingName = "storage-queue")] JObject triggerData,
-            ILogger log)
+            [DaprBindingTrigger(BindingName = "storage-queue")] JObject triggerData)
     {
-        log.LogInformation("Hello from AzureStorageQueue!");
+        logger.LogInformation("Hello from AzureStorageQueue!");
 
-        log.LogInformation($"Trigger data: {triggerData}");
+        logger.LogInformation($"Trigger data: {triggerData}");
     }
 
 }

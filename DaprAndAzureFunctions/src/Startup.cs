@@ -12,7 +12,12 @@ public class Startup : FunctionsStartup
 {
     public override void Configure(IFunctionsHostBuilder builder)
     {
-        builder.Services.AddLogging(configure => configure.AddConsole()); 
+        ILoggerFactory loggerFactory =  LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+        });
+        builder.Services.AddSingleton(loggerFactory);
+         
         builder.Services.AddSingleton<IDaprOutputBindingService, DaprOutputBindingService>();
     }
 
