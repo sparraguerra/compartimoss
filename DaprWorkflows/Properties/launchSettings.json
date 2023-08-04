@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DaprWorkflows": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}
