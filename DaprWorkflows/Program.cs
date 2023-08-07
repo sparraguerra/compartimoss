@@ -1,8 +1,17 @@
 ﻿using Dapr.Client;
 using Dapr.Workflow;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using DaprWorkflows.Models;
+using DaprWorkflows.Workflows;
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DAPR_HTTP_PORT")))
+{
+    Environment.SetEnvironmentVariable("DAPR_HTTP_PORT", "3500");
+}
+
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DAPR_GRPC_PORT")))
+{
+    Environment.SetEnvironmentVariable("DAPR_GRPC_PORT", "4001");
+}
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
@@ -10,12 +19,9 @@ using IHost host = Host.CreateDefaultBuilder(args)
         services.AddLogging();
         services.AddSingleton<DaprClient>(new DaprClientBuilder().Build());
         services.AddDaprWorkflow(options =>
-        {
-            //// Note that it's also possible to register a lambda function as the workflow
-            //// or activity implementation instead of a class.
-            //options.RegisterWorkflow<OrderProcessingWorkflow>();
+        { 
+            options.RegisterWorkflow<MainOrchestratorWorkflow>();
 
-            //// These are the activities that get invoked by the workflow(s).
             //options.RegisterActivity<NotifyActivity>();
             //options.RegisterActivity<ReserveInventoryActivity>();
             //options.RegisterActivity<RequestApprovalActivity>();
@@ -32,7 +38,36 @@ using IHost host = Host.CreateDefaultBuilder(args)
 await host.StartAsync();
 
 var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
- 
+
+
+using var daprClient = new DaprClientBuilder().Build();
+
+// Wait for the sidecar to become available
+while (!await daprClient.CheckHealthAsync())
+{
+    Thread.Sleep(TimeSpan.FromSeconds(5));
+}
+
+for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine($"Initiating Workflow '{i}'");
+    await SchedulingMainWorkflowAsync($"TEST MESSAGE {i}", host.Services.GetService<DaprWorkflowClient>()!);
+    await Task.Delay(500);
+}
 
 lifetime.StopApplication();
 await host.WaitForShutdownAsync();
+
+static async Task SchedulingMainWorkflowAsync(string message, DaprWorkflowClient daprClient)
+{ 
+    using var cts = new CancellationTokenSource();
+    var customerId = Guid.NewGuid().ToString();
+    var data = new PaymentRequest(customerId, $"Payment for customer {customerId}", 100, "USD");
+    var instanceId = await daprClient.ScheduleNewWorkflowAsync(
+                                name: nameof(MainOrchestratorWorkflow),
+                                input: data);
+
+    var workflowState = await daprClient.WaitForWorkflowStartAsync(instanceId: instanceId, true, cts.Token);
+
+    Console.WriteLine($"Workflow: {nameof(MainOrchestratorWorkflow)} (ID = {instanceId}) started successfully."); 
+}

@@ -1,7 +1,8 @@
 {
   "profiles": {
     "DaprWorkflows": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "launchBrowser": false      
     },
     "Docker": {
       "commandName": "Docker"
