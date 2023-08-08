@@ -1,7 +1,7 @@
 ﻿using Dapr.Client;
 using Dapr.Workflow;
-using DaprWorkflows.Models;
-using DaprWorkflows.Workflows;
+using DaprWorkflows.Activities.TaskChaining;
+using DaprWorkflows.Workflows.TaskChaining;
 
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DAPR_HTTP_PORT")))
 {
@@ -13,20 +13,21 @@ if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DAPR_GRPC_PORT")))
     Environment.SetEnvironmentVariable("DAPR_GRPC_PORT", "4001");
 }
 
-using IHost host = Host.CreateDefaultBuilder(args)
+using IHost host = Host.CreateDefaultBuilder(args) 
     .ConfigureServices((context, services) =>
     {
         services.AddLogging();
         services.AddSingleton<DaprClient>(new DaprClientBuilder().Build());
         services.AddDaprWorkflow(options =>
-        { 
-            options.RegisterWorkflow<MainOrchestratorWorkflow>();
+        {
+            #region TaskChaining
+            options.RegisterWorkflow<TaskChainingOrchestratorWorkFlow>();
 
-            //options.RegisterActivity<NotifyActivity>();
-            //options.RegisterActivity<ReserveInventoryActivity>();
-            //options.RegisterActivity<RequestApprovalActivity>();
-            //options.RegisterActivity<ProcessPaymentActivity>();
-            //options.RegisterActivity<UpdateInventoryActivity>();
+            options.RegisterActivity<TaskChaining1Activity>();
+            options.RegisterActivity<TaskChaining2Activity>();
+            options.RegisterActivity<TaskChaining3Activity>();
+            options.RegisterActivity<TaskChaining4Activity>();
+            #endregion
         });
     })
     .ConfigureLogging((context, cfg) =>
@@ -35,10 +36,16 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-await host.StartAsync();
+Console.ForegroundColor = ConsoleColor.White;
+Console.WriteLine("*** Welcome to the Dapr Workflow console app sample!");
+Console.WriteLine("*** Using this app, you can place orders that start workflows.");
+Console.WriteLine("*** Ensure that Dapr is running in a separate terminal window using the following command:");
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine("        dapr run --dapr-grpc-port 4001 --app-id wfapp");
+Console.WriteLine();
+Console.ResetColor();
 
-var lifetime = host.Services.GetRequiredService<IHostApplicationLifetime>();
-
+host.Start();
 
 using var daprClient = new DaprClientBuilder().Build();
 
@@ -48,26 +55,24 @@ while (!await daprClient.CheckHealthAsync())
     Thread.Sleep(TimeSpan.FromSeconds(5));
 }
 
-for (int i = 0; i < 10; i++)
+var scheduledOrchestrations = new List<Task>
 {
-    Console.WriteLine($"Initiating Workflow '{i}'");
-    await SchedulingMainWorkflowAsync($"TEST MESSAGE {i}", host.Services.GetService<DaprWorkflowClient>()!);
-    await Task.Delay(500);
+SchedulingTaskChainingWorkflowAsync(host.Services.GetService<DaprWorkflowClient>()!)
+};
+
+await Task.WhenAll(scheduledOrchestrations);
+
+while (true)
+{
+    Console.Read();
 }
 
-lifetime.StopApplication();
-await host.WaitForShutdownAsync();
-
-static async Task SchedulingMainWorkflowAsync(string message, DaprWorkflowClient daprClient)
+static async Task SchedulingTaskChainingWorkflowAsync(DaprWorkflowClient daprWorkflowClient)
 { 
-    using var cts = new CancellationTokenSource();
-    var customerId = Guid.NewGuid().ToString();
-    var data = new PaymentRequest(customerId, $"Payment for customer {customerId}", 100, "USD");
-    var instanceId = await daprClient.ScheduleNewWorkflowAsync(
-                                name: nameof(MainOrchestratorWorkflow),
-                                input: data);
+    using var cts = new CancellationTokenSource(); 
+    var input = "Execute TaskChainingOrchestratorWorkFlow";
+    var instanceId = await daprWorkflowClient.ScheduleNewWorkflowAsync(name: nameof(TaskChainingOrchestratorWorkFlow), input: input);
+    var workflowState = await daprWorkflowClient.WaitForWorkflowStartAsync(instanceId: instanceId, true, cts.Token);
 
-    var workflowState = await daprClient.WaitForWorkflowStartAsync(instanceId: instanceId, true, cts.Token);
-
-    Console.WriteLine($"Workflow: {nameof(MainOrchestratorWorkflow)} (ID = {instanceId}) started successfully."); 
+    Console.WriteLine($"Workflow: {nameof(TaskChainingOrchestratorWorkFlow)} (ID = {instanceId}) started successfully."); 
 }
